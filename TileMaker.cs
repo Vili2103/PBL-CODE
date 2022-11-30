@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 
 public class TileMaker : MonoBehaviour
 {
-    [SerializeField] //this alows us to see the tilemap in the unity inspector
+    [SerializeField] //this alows us to see the tilemap in the unity inspector and it still remains private.
     private Tilemap floorTilemap;
     [SerializeField]
     private TileBase floorTiles; // we will later use an array in order to generate a random tile
@@ -26,11 +26,11 @@ public class TileMaker : MonoBehaviour
 
     private void PlaceSingleTile(Tilemap tilemap, TileBase tiles, Vector2Int pos)
     {
-        var tilePos = tilemap.WorldToCell((Vector3Int)pos);
-        tilemap.SetTile(tilePos, tiles);
+        var tilePos = tilemap.WorldToCell((Vector3Int)pos); //We locate the position of where we should place the tile
+        tilemap.SetTile(tilePos, tiles); // .SetTile is a method provided by Unity
     }
     public void ClearTiles()
     {
-        floorTilemap.ClearAllTiles();
+        floorTilemap.ClearAllTiles(); // We clear all tiles every time we generate a new map
     }
 }
