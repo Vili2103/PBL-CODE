@@ -13,11 +13,16 @@ public class TileMaker : MonoBehaviour
     [SerializeField]
     private TileBase floorTiles; // Basic floor tiles
     [SerializeField]
-    private TileBase crackedTile; // The variation of the normal tile with a lesser chance of spawning.
+    protected TileBase crackedTile; // The variation of the normal tile with a lesser chance of spawning.
     [SerializeField]
     private TileBase wall; // Wall tile
     [SerializeField]
-    private TileBase veryCrackedTile; // The variation of the normal tile with a very small chance of spawning.
+    protected TileBase veryCrackedTile; // The variation of the normal tile with a very small chance of spawning.
+    [SerializeField]
+    protected TileBase wallSideRight, wallSideLeft, wallCornerDownLeft, wallCornerUpLeft, wallCornerDownRight, wallCornerUpRight, wallFliped;
+    //[SerializeField]
+    // protected TileBase ruleTile;
+
 
     public void PlaceFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
@@ -26,20 +31,64 @@ public class TileMaker : MonoBehaviour
 
     private void PlaceTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tiles)
     {
-       foreach(var pos in positions) // The PaintTiles method pretty much loops through the PlaceSingleTile method which places our tiles one at a time.
+        foreach (var pos in positions) // The PaintTiles method pretty much loops through the PlaceSingleTile method which places our tiles one at a time.
         {
-            PlaceSingleTile(tilemap, tiles, pos,crackedTile,veryCrackedTile);
+            PlaceSingleTile(tilemap, tiles, pos, crackedTile, veryCrackedTile);
         }
+    }
+
+    internal void PlaceSingleCornerWall(Vector2Int pos, string neighboursType)
+    {
+        int byteInInt = Convert.ToInt32(neighboursType, 2);
+        TileBase tile = null;
+        if (WallBytes.wallDiagonalCornerUpLeft.Contains(byteInInt))
+        {
+            tile = wallCornerUpLeft;
+        }
+        else if (WallBytes.wallDiagonalCornerDownLeft.Contains(byteInInt))
+        {
+
+            tile = wall;
+        }
+        else if (WallBytes.wallDiagonalCornerDownRight.Contains(byteInInt))
+        {
+
+            tile = wall;
+
+        }
+        else if (WallBytes.wallDiagonalCornerUpRight.Contains(byteInInt))
+        {
+            tile = wallCornerUpRight;
+        }
+        else if (WallBytes.wallSideLeft.Contains(byteInInt))
+        {
+            tile = wallSideLeft;
+        }
+        else if (WallBytes.wallSideRight.Contains(byteInInt))
+        {
+            tile = wallSideRight;
+        }
+        else if (WallBytes.wallBottmEightDirections.Contains(byteInInt))
+        {
+            tile = wall;
+        }
+        else if (WallBytes.wallBottm.Contains(byteInInt))
+        {
+            tile = wall;
+        }
+        if (tile != null)
+            PlaceSingleTile(wallTilemap, tile, pos);
     }
 
     private void PlaceSingleTile(Tilemap tilemap, TileBase tiles, Vector2Int pos, TileBase decoration, TileBase rareDecoration)
     {
         System.Random rd = new System.Random();
         int num = rd.Next(1, 100);
-        if (num < 8)
+        if (num < 4)
         {
             tiles = decoration;
-        }else if (num > 96)
+        }
+        else if (num > 98)
         {
             tiles = rareDecoration;
         }
@@ -48,15 +97,43 @@ public class TileMaker : MonoBehaviour
     }
 
     private void PlaceSingleTile(Tilemap tilemap, TileBase tiles, Vector2Int pos) //overloading the method for tiles which dont have any decoration
-        // like walls, for now.
+                                                                                  // like walls, for now.
     {
-        
+
         var tilePos = tilemap.WorldToCell((Vector3Int)pos);
         tilemap.SetTile(tilePos, tiles);
     }
-    internal void PlaceSingleBasicWall(Vector2Int position)
+    internal void PlaceSingleBasicWall(Vector2Int position, string binaryType)
     {
-        PlaceSingleTile(wallTilemap, wall, position);
+        int typeAsInt = Convert.ToInt32(binaryType, 2);
+        TileBase tile = null;
+        if (WallBytes.wallSideLeft.Contains(typeAsInt))
+        {
+            tile = wall;
+        }
+        else if (WallBytes.wallBottm.Contains(typeAsInt))
+        {
+            tile = wall;
+        }
+        else if (WallBytes.wallFull.Contains(typeAsInt))
+        {
+            tile = wall;
+        }
+
+        else if (WallBytes.wallTop.Contains(typeAsInt))
+        {
+            tile = wallSideLeft; // .... this is stupid but Im too lazy to change the name in the other file
+        }
+        else if (WallBytes.wallSideRight.Contains(typeAsInt))
+        {
+            tile = wallSideRight;
+        }
+        else
+        {
+            tile = floorTiles;
+        }
+        if (tile != null)
+            PlaceSingleTile(wallTilemap, tile, position);
     }
 
     public void ClearTiles()
@@ -65,3 +142,4 @@ public class TileMaker : MonoBehaviour
         wallTilemap.ClearAllTiles();
     }
 }
+    

@@ -4,30 +4,16 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
-    [SerializeField] // So we can acess it from the inspector even though it's private.
-    private int strength=10;
-     [SerializeField]
-    private int agility = 10;
-     [SerializeField]
-    private int intelligence = 10;
-     [SerializeField]
-    private int dexterity = 10;
-     [SerializeField]
-    private int vigour = 10;
-     [SerializeField]
-    private int level
-     [SerializeField]
-    private float currentXP=0;
-     [SerializeField]
-    private float neededXP;
+    public int strength=10;
+    public int agility = 10;
+    public int intelligence = 10;
+    public int dexterity = 10;
+    public int vigour = 10;
+    public int level;
+    public float currentXP=0;
+    public float neededXP;
 
  
-    
-
-    
-
-
-    // Update is called once per frame
     void Update()
     {
         
@@ -40,7 +26,13 @@ public class PlayerStats : MonoBehaviour
 
     void Death()
     {
-  
+      strength = 10;
+      agility = 10;
+      intelligence = 10;
+      dexterity = 10;
+      vigour = 10;
+      level=1;
+      currentXP = 0;
      
 }
 
