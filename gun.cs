@@ -7,17 +7,12 @@ using UnityEngine;
 public class gun : MonoBehaviour
 {
     public float RotationSpeed;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-        //Debug.Log("Hit!");
-    }
+   
     
     public Vector2 MousePos;
     public Vector2 WorldPos;
 
-    // Update is called once per frame
+  
     void Update()
     {
         //gets world position of object
