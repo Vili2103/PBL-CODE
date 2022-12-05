@@ -7,7 +7,8 @@ using Random = UnityEngine.Random;
 public class RandomWalkMapGen : AbstractDungeonGen
 {
     [SerializeField]
-    protected DungeonScriptableObjects randomWalkParams;
+    protected DungeonScriptableObjects randomWalkParams; // WITH THIS WE CAN SET THE PARAMETERS OF OUR DUNGEON FROM THE EDITOR OR CHANGE IT DEPENDING ON THE LEVEL 
+    // BY USING A DIFFERENT SO
     protected override void RunPPG()
     {
         HashSet<Vector2Int> floorPositions = RunRandomWalk(randomWalkParams,startPos);

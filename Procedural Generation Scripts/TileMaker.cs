@@ -33,12 +33,14 @@ public class TileMaker : MonoBehaviour
     {
         foreach (var pos in positions) // The PaintTiles method pretty much loops through the PlaceSingleTile method which places our tiles one at a time.
         {
-            PlaceSingleTile(tilemap, tiles, pos, crackedTile, veryCrackedTile);
+            PlaceSingleTile(tilemap, tiles, pos, crackedTile, veryCrackedTile); // CALLS THE OVERLOADED METHOD (THE ONE THAT TAKES MORE PARAMETERS)
         }
     }
 
     internal void PlaceSingleCornerWall(Vector2Int pos, string neighboursType)
     {
+        /* WE CHECK THE POSITIONS OF THE FLOORS AND WALLS THAT NEIGHBOUR OUR GIVEN TILE. THEN, WE SEE WHAT
+  * TILE WE SHOULD PLACE (FROM Wall Bytes) */
         int byteInInt = Convert.ToInt32(neighboursType, 2);
         TileBase tile = null;
         if (WallBytes.wallDiagonalCornerUpLeft.Contains(byteInInt))
@@ -76,9 +78,11 @@ public class TileMaker : MonoBehaviour
         {
             tile = wall;
         }
-        if (tile != null)
+    if (tile != null)
             PlaceSingleTile(wallTilemap, tile, pos);
+      
     }
+    
 
     private void PlaceSingleTile(Tilemap tilemap, TileBase tiles, Vector2Int pos, TileBase decoration, TileBase rareDecoration)
     {
@@ -88,7 +92,7 @@ public class TileMaker : MonoBehaviour
         {
             tiles = decoration;
         }
-        else if (num > 98)
+        else if (num > 98) // GOOFY WAY OF DOING WEIGHTED RANDOM TILES BUT IT WORKS :)
         {
             tiles = rareDecoration;
         }
@@ -97,7 +101,7 @@ public class TileMaker : MonoBehaviour
     }
 
     private void PlaceSingleTile(Tilemap tilemap, TileBase tiles, Vector2Int pos) //overloading the method for tiles which dont have any decoration
-                                                                                  // like walls, for now.
+                                                                                 // like walls, for now.
     {
 
         var tilePos = tilemap.WorldToCell((Vector3Int)pos);
@@ -105,11 +109,21 @@ public class TileMaker : MonoBehaviour
     }
     internal void PlaceSingleBasicWall(Vector2Int position, string binaryType)
     {
+        /* WE CHECK THE POSITIONS OF THE FLOORS AND WALLS THAT NEIGHBOUR OUR GIVEN TILE. THEN, WE SEE WHAT
+         * TILE WE SHOULD PLACE (FROM Wall Bytes) */
         int typeAsInt = Convert.ToInt32(binaryType, 2);
         TileBase tile = null;
-        if (WallBytes.wallSideLeft.Contains(typeAsInt))
+        if (WallBytes.wallTop.Contains(typeAsInt))
         {
             tile = wall;
+        }
+        else if (WallBytes.wallSideRight.Contains(typeAsInt))
+        {
+            tile = wallSideRight;
+        }
+        else if (WallBytes.wallSideLeft.Contains(typeAsInt))
+        {
+            tile = wallSideLeft;
         }
         else if (WallBytes.wallBottm.Contains(typeAsInt))
         {
@@ -119,26 +133,13 @@ public class TileMaker : MonoBehaviour
         {
             tile = wall;
         }
-
-        else if (WallBytes.wallTop.Contains(typeAsInt))
-        {
-            tile = wallSideLeft; // .... this is stupid but Im too lazy to change the name in the other file
-        }
-        else if (WallBytes.wallSideRight.Contains(typeAsInt))
-        {
-            tile = wallSideRight;
-        }
-        else
-        {
-            tile = floorTiles;
-        }
         if (tile != null)
             PlaceSingleTile(wallTilemap, tile, position);
     }
 
     public void ClearTiles()
     {
-        floorTilemap.ClearAllTiles();
+        floorTilemap.ClearAllTiles(); // DELETES ALL TILES FROM TILEMAPS WHEN CREATING A NEW DUNGEON 
         wallTilemap.ClearAllTiles();
     }
 }

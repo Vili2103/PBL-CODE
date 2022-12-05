@@ -12,12 +12,14 @@ public class RoomFirstGen : RandomWalkMapGen
     private int dungeonWidth = 100, dungeonHeight = 100;
     [SerializeField]
     [Range(1, 10)]
-    private int offset = 5;
+    private int offset = 5; // OFFSET EXSISTS SO OUR ROOMS DON'T OVERLAP. IT'S THE MIN DISTANCE BETWEEN TWO ROOMS
     [SerializeField]
     private bool randomWalkRooms = false;
 
     protected override void RunPPG()
     {
+        // SINCE RUNPPG IS AN ABSTRACT METHOD WE CAN JUST OVERRIDE IT. THIS IS LIKE OVERLOADING BUT COOLER BECAUSE WE CHANGE THE
+        // WHOLE METHOD AND DON'T NEED TO RECEIVE MORE OR LESS PARAMETERS
         CreateRooms();
     }
 
@@ -28,24 +30,24 @@ public class RoomFirstGen : RandomWalkMapGen
 
         if (randomWalkRooms)
         {
-            floor = CreateRandomRooms(roomList);
+            floor = CreateRandomRooms(roomList); //ROOMS ARE MADE USING THE RANDOMWALK ALGORITHM
         }
         else
         {
-            floor = CreateSimpleRooms(roomList);
+            floor = CreateSimpleRooms(roomList); // ROOMS ARE MADE USING THE BINARY SPACE PARTITIONING ALGORITHM
         }
         
         List<Vector2Int> roomCenters = new List<Vector2Int>();
         foreach(var room in roomList)
         {
-            roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
+            roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center)); // WE USE THIS TO MAKE CORRIDORS TO EACH ROOM CENTERR, TO ENSURE THAT EVERY ROOM IS CONNECTED TO ANOTHER.
 
         }
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
-        floor.UnionWith(corridors);
+        floor.UnionWith(corridors); //UnionWith IS A HASHSET BUILT IN METHOD. HERE WE USE IT TO MAKE THE CORRIDOR TILES A PART OF THE FLOOR POSITIONS HASHSET
 
-        tileMaker.PlaceFloorTiles(floor);
-        WallMaker.MakeWalls(floor, tileMaker); 
+        tileMaker.PlaceFloorTiles(floor); // WE PLACE THE FLOOR TILES, INCLUDING THE CORRIDORS.
+        WallMaker.MakeWalls(floor, tileMaker);  //WE ADD WALLS
     }
 
     private HashSet<Vector2Int> CreateRandomRooms(List<BoundsInt> roomList)
@@ -69,6 +71,7 @@ public class RoomFirstGen : RandomWalkMapGen
 
     private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomCenters)
     {
+        //THIS METHOD CONNECTS ROOMS BY FINDING THE CLOSEST ROOMCENTERS AND CONNECTING THEM WITH CORRIDORS
         HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
         var currentRoomCenter = roomCenters[UnityEngine.Random.Range(0, roomCenters.Count)];
         roomCenters.Remove(currentRoomCenter);
@@ -118,7 +121,7 @@ public class RoomFirstGen : RandomWalkMapGen
     private Vector2Int FindClosestPointTo(Vector2Int currentRoomCenter, List<Vector2Int> roomCenters)
     {
         Vector2Int closestCenter = Vector2Int.zero;
-        float length = float.MaxValue;
+        float length = float.MaxValue; // JUST SO THE FIRST IF RUNS 100% OF THE TIME 
         foreach(var pos in roomCenters)
         {
             float distance = Vector2.Distance(pos, currentRoomCenter);

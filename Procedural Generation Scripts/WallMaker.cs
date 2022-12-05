@@ -13,9 +13,10 @@ public static class WallMaker
         CreateCornerWalls(tileMaker, cornerPos, floorPositions);
 
     }
-
+    // THIS WHOLE SCRIPT SERVES TO CALCULATE WHAT TILE WE ARE SUPPOSED TO HAVE AT OUR SPECIFIC LOCATION. 
     private static void CreateCornerWalls(TileMaker tileMaker, HashSet<Vector2Int> cornerPos, HashSet<Vector2Int> floorPositions)
     {
+        // 
         foreach (var pos in cornerPos)
         {
             string neighboursType = string.Empty;
@@ -24,17 +25,19 @@ public static class WallMaker
                 var neighbourPos = pos + dir;
                 if (floorPositions.Contains(neighbourPos))
                 {
-                    neighboursType += "1";
+                    neighboursType += "1"; // THIS MEANS THAT WE ADD 1 TO THE BYTE VALUE. 1 MEANS THAT THERE IS A FLOOR IN THIS GIVEN DIRECTION. 
                 }
                 else
                 {
-                    neighboursType += "0";
+                    neighboursType += "0"; // 0 -> FLOOR IN THE GIVEN DIRECTION
                 }
             }
-            tileMaker.PlaceSingleCornerWall(pos, neighboursType);
+            tileMaker.PlaceSingleCornerWall(pos, neighboursType); 
+            // THE tileMaker  SCRIPT CHECKS THE BYTE VALUE OF neighboursType AND CALCULATES WHICH TILE TO PLACE. 
+            // tileMaker CHECKS IF ONE OF THE LISTS IN Wall Bytes CONTAINS neighboursType, WHICH WE PASS ON HERE.
         }
     }
-
+    
     private static void CreateBasicWalls(TileMaker tileMaker, HashSet<Vector2Int> wallPos, HashSet<Vector2Int> floorPositions)
     {
         foreach (var position in wallPos)
@@ -53,6 +56,8 @@ public static class WallMaker
                 }
             }
             tileMaker.PlaceSingleBasicWall(position,neighboursBinary);
+            // THE tileMaker  SCRIPT CHECKS THE BYTE VALUE OF neighboursType AND CALCULATES WHICH TILE TO PLACE. 
+            // tileMaker CHECKS IF ONE OF THE LISTS IN Wall Bytes CONTAINS neighboursType, WHICH WE PASS ON HERE.
         }
     }
 
@@ -71,5 +76,6 @@ public static class WallMaker
             }
         }
         return wallPositions;
+        // THIS METHOD CHECKS EVERY FLOOR POSITION AND CHECKS WHERE THERE ARE EMPTY SPACES. THEY ARE LATER FILLED IN BY WALLS.
     }
 }

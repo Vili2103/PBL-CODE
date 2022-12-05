@@ -12,7 +12,8 @@ public class CorridorFirstGen : RandomWalkMapGen
     [Range(0.1f, 1)] // Sets a range for the roomPercent variable. It cannot be bigger than one since it is a %
     private float roomPercent=0.8f; //Chance to spawn a room where there is enough space to.    
    
-    protected override void RunPPG()
+    protected override void RunPPG() // OVERRIDING AN ABSTRACT METHOD IS BASICALLY OVERLOADING BUT COOLER
+        // SINCE WE DONT HAVE TO CHANGE THE PARAMETERS OR ANYTHING, BUT WE JUST CHANGE THE METHOD ALLTOGETHER.
     {
         corridorFirstGeneration();
     }
@@ -49,6 +50,7 @@ public class CorridorFirstGen : RandomWalkMapGen
 
     private List<Vector2Int> FindDeadEnds(HashSet<Vector2Int> floorPos)
     {
+   
         List<Vector2Int> deadEnds = new List<Vector2Int>();
         foreach(var pos in floorPos)
         {
@@ -72,21 +74,22 @@ public class CorridorFirstGen : RandomWalkMapGen
     private HashSet<Vector2Int> CreateRooms(HashSet<Vector2Int> potentialRoomPos)
     {
         HashSet<Vector2Int> roomPositions = new HashSet<Vector2Int>();
-        int roomCount = Mathf.RoundToInt(potentialRoomPos.Count * roomPercent);
+        int roomCount = Mathf.RoundToInt(potentialRoomPos.Count * roomPercent); // WE MULTIPLY THE NUMBER OF POTENTIAL ROOMS BY THE ROOM SPAWN PERCENTAGE TO GET OUR ROOMCOUNT.
         List<Vector2Int> roomsToMake = potentialRoomPos.OrderBy(x => Guid.NewGuid()).Take(roomCount).ToList();  //Gui = Globaly Unique Identifier x=> is a LAMBDA expression
+        // 
 
         foreach(var roomPos in roomsToMake)
         {
             var room = RunRandomWalk(randomWalkParams,roomPos);
-            roomPositions.UnionWith(room);
+            roomPositions.UnionWith(room);// BUILT IN HASHSET METHOD!!! 
         }
         return roomPositions;
-                
 
     }
 
     private void makeCorridors(HashSet<Vector2Int> floorPos, HashSet<Vector2Int> potentialRoomPos)
     {
+        //RANDOM WALK CORRIDORS WITH THE STARTING POINT BEING startPos
         var pos = startPos;
         potentialRoomPos.Add(pos);
 

@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 
 public abstract class AbstractDungeonGen : MonoBehaviour
 {   
+    
   [SerializeField]
   protected TileMaker tileMaker = null;
     [SerializeField]

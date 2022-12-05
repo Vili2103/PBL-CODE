@@ -4,17 +4,21 @@ using UnityEngine;
 
 public static class WallBytes
 {
-    public static HashSet<int> wallTop = new HashSet<int>
+    public static HashSet<int> wallSideLeft = new HashSet<int>
     {
+
+
+
+        0b0010
+       
+        // BYTE VALUES REPRESENTING THE FLOOR TILES BORDERING THE WALL TILES. 0 = WALL / NOTHING, 1 =FLOOR. 
       
-        0b1010, // BYTE VALUES REPRESENTING THE FLOOR TILES BORDERING THE WALL TILES. 0 = WALL / NOTHING, 1 =FLOOR. 
-        0b010,
         
 
       
     };
 
-    public static HashSet<int> wallSideLeft = new HashSet<int>
+    public static HashSet<int> wallTop = new HashSet<int>
     {
         0b0100
     };
