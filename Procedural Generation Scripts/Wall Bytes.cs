@@ -1,31 +1,31 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public static class WallBytes
 {
-    public static HashSet<int> wallSideLeft = new HashSet<int>
+    public static HashSet<int> wallTop = new HashSet<int>
     {
-
-
-
-        0b0010
-       
-        // BYTE VALUES REPRESENTING THE FLOOR TILES BORDERING THE WALL TILES. 0 = WALL / NOTHING, 1 =FLOOR. 
-      
-        
-
-      
+        0b1111,
+        0b0110,
+        0b0011,
+        0b0010,
+        0b1010,
+        0b1100,
+        0b1110,
+        0b1011,
+        0b0111
     };
 
-    public static HashSet<int> wallTop = new HashSet<int>
+    public static HashSet<int> wallSideLeft = new HashSet<int>
     {
         0b0100
     };
 
     public static HashSet<int> wallSideRight = new HashSet<int>
     {
-        0b0001
+        0b0001,
+        0b0101
     };
 
     public static HashSet<int> wallBottm = new HashSet<int>
@@ -105,8 +105,7 @@ public static class WallBytes
         0b1101,
         0b0101,
         0b1101,
-        0b1001,
-        0b01010101
+        0b1001
 
     };
 

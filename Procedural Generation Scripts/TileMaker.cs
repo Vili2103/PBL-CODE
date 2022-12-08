@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,23 +6,12 @@ using UnityEngine.Tilemaps;
 
 public class TileMaker : MonoBehaviour
 {
-    [SerializeField] //this alows us to see the tilemap in the unity inspector
-    private Tilemap floorTilemap;
+    [SerializeField]  //this alows us to see the tilemap in the unity inspector
+    private Tilemap floorTilemap, wallTilemap; // Different Tilemap so  we can impelement hitboxes.
     [SerializeField]
-    private Tilemap wallTilemap; // Different Tilemap so  we can impelement hitboxes.
-    [SerializeField]
-    private TileBase floorTiles; // Basic floor tiles
-    [SerializeField]
-    protected TileBase crackedTile; // The variation of the normal tile with a lesser chance of spawning.
-    [SerializeField]
-    private TileBase wall; // Wall tile
-    [SerializeField]
-    protected TileBase veryCrackedTile; // The variation of the normal tile with a very small chance of spawning.
-    [SerializeField]
-    protected TileBase wallSideRight, wallSideLeft, wallCornerDownLeft, wallCornerUpLeft, wallCornerDownRight, wallCornerUpRight, wallFliped;
-    //[SerializeField]
-    // protected TileBase ruleTile;
-
+    private TileBase floorTiles,crackedFloor,veryCrackedFloor, wallTop, wallSideRight, wallSiderLeft, wallBottom, wallFull, 
+        wallInnerCornerDownLeft, wallInnerCornerDownRight, 
+        wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
 
     public void PlaceFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
@@ -31,58 +20,45 @@ public class TileMaker : MonoBehaviour
 
     private void PlaceTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tiles)
     {
-        foreach (var pos in positions) // The PaintTiles method pretty much loops through the PlaceSingleTile method which places our tiles one at a time.
+        foreach (var pos in positions)  // The PlaceTiles method pretty much loops through the PlaceSingleTile method which places our tiles one at a time.
         {
-            PlaceSingleTile(tilemap, tiles, pos, crackedTile, veryCrackedTile); // CALLS THE OVERLOADED METHOD (THE ONE THAT TAKES MORE PARAMETERS)
+            PlaceSingleTile(tilemap, tiles, pos,crackedFloor,veryCrackedFloor);  // CALLS THE OVERLOADED METHOD (THE ONE THAT TAKES MORE PARAMETERS)
         }
     }
 
-    internal void PlaceSingleCornerWall(Vector2Int pos, string neighboursType)
+    internal void PaintSingleBasicWall(Vector2Int position, string binaryType)
     {
-        /* WE CHECK THE POSITIONS OF THE FLOORS AND WALLS THAT NEIGHBOUR OUR GIVEN TILE. THEN, WE SEE WHAT
-  * TILE WE SHOULD PLACE (FROM Wall Bytes) */
-        int byteInInt = Convert.ToInt32(neighboursType, 2);
+        int typeAsInt = Convert.ToInt32(binaryType, 2);
         TileBase tile = null;
-        if (WallBytes.wallDiagonalCornerUpLeft.Contains(byteInInt))
+        if (WallBytes.wallTop.Contains(typeAsInt))
         {
-            tile = wallCornerUpLeft;
-        }
-        else if (WallBytes.wallDiagonalCornerDownLeft.Contains(byteInInt))
-        {
-
-            tile = wall;
-        }
-        else if (WallBytes.wallDiagonalCornerDownRight.Contains(byteInInt))
-        {
-
-            tile = wall;
-
-        }
-        else if (WallBytes.wallDiagonalCornerUpRight.Contains(byteInInt))
-        {
-            tile = wallCornerUpRight;
-        }
-        else if (WallBytes.wallSideLeft.Contains(byteInInt))
-        {
-            tile = wallSideLeft;
-        }
-        else if (WallBytes.wallSideRight.Contains(byteInInt))
+            tile = wallTop;
+        }else if (WallBytes.wallSideRight.Contains(typeAsInt))
         {
             tile = wallSideRight;
         }
-        else if (WallBytes.wallBottmEightDirections.Contains(byteInInt))
+        else if (WallBytes.wallSideLeft.Contains(typeAsInt))
         {
-            tile = wall;
+            tile = wallSiderLeft;
         }
-        else if (WallBytes.wallBottm.Contains(byteInInt))
+        else if (WallBytes.wallBottm.Contains(typeAsInt))
         {
-            tile = wall;
+            tile = wallBottom;
         }
-    if (tile != null)
-            PlaceSingleTile(wallTilemap, tile, pos);
-      
+        else if (WallBytes.wallFull.Contains(typeAsInt))
+        {
+            tile = wallFull;
+        }
+
+        if (tile!=null)
+            PaintSingleTile(wallTilemap, tile, position);
     }
-    
+
+    private void PaintSingleTile(Tilemap tilemap, TileBase tile, Vector2Int position)
+    {
+        var tilePos = tilemap.WorldToCell((Vector3Int)position);
+        tilemap.SetTile(tilePos, tile);
+    }
 
     private void PlaceSingleTile(Tilemap tilemap, TileBase tiles, Vector2Int pos, TileBase decoration, TileBase rareDecoration)
     {
@@ -100,47 +76,57 @@ public class TileMaker : MonoBehaviour
         tilemap.SetTile(tilePos, tiles);
     }
 
-    private void PlaceSingleTile(Tilemap tilemap, TileBase tiles, Vector2Int pos) //overloading the method for tiles which dont have any decoration
-                                                                                 // like walls, for now.
-    {
 
-        var tilePos = tilemap.WorldToCell((Vector3Int)pos);
-        tilemap.SetTile(tilePos, tiles);
-    }
-    internal void PlaceSingleBasicWall(Vector2Int position, string binaryType)
-    {
-        /* WE CHECK THE POSITIONS OF THE FLOORS AND WALLS THAT NEIGHBOUR OUR GIVEN TILE. THEN, WE SEE WHAT
-         * TILE WE SHOULD PLACE (FROM Wall Bytes) */
-        int typeAsInt = Convert.ToInt32(binaryType, 2);
-        TileBase tile = null;
-        if (WallBytes.wallTop.Contains(typeAsInt))
-        {
-            tile = wall;
-        }
-        else if (WallBytes.wallSideRight.Contains(typeAsInt))
-        {
-            tile = wallSideRight;
-        }
-        else if (WallBytes.wallSideLeft.Contains(typeAsInt))
-        {
-            tile = wallSideLeft;
-        }
-        else if (WallBytes.wallBottm.Contains(typeAsInt))
-        {
-            tile = wall;
-        }
-        else if (WallBytes.wallFull.Contains(typeAsInt))
-        {
-            tile = wall;
-        }
-        if (tile != null)
-            PlaceSingleTile(wallTilemap, tile, position);
-    }
+
 
     public void ClearTiles()
     {
-        floorTilemap.ClearAllTiles(); // DELETES ALL TILES FROM TILEMAPS WHEN CREATING A NEW DUNGEON 
+        floorTilemap.ClearAllTiles();
         wallTilemap.ClearAllTiles();
     }
+
+    internal void PlaceSingleCornerWall(Vector2Int position, string binaryType)
+    {
+        /* WE CHECK THE POSITIONS OF THE FLOORS AND WALLS THAT NEIGHBOUR OUR GIVEN TILE. THEN, WE SEE WHAT TILE WE SHOULD PLACE (FROM Wall Bytes) */
+
+        int typeASInt = Convert.ToInt32(binaryType, 2);
+        TileBase tile = null;
+
+        if (WallBytes.wallInnerCornerDownLeft.Contains(typeASInt))
+        {
+            tile = wallInnerCornerDownLeft;
+        }
+        else if (WallBytes.wallInnerCornerDownRight.Contains(typeASInt))
+        {
+            tile = wallInnerCornerDownRight;
+        }
+        else if (WallBytes.wallDiagonalCornerDownLeft.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerDownLeft;
+        }
+        else if (WallBytes.wallDiagonalCornerDownRight.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerDownRight;
+        }
+        else if (WallBytes.wallDiagonalCornerUpRight.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerUpRight;
+        }
+        else if (WallBytes.wallDiagonalCornerUpLeft.Contains(typeASInt))
+        {
+            tile = wallDiagonalCornerUpLeft;
+        }
+        else if (WallBytes.wallFullEightDirections.Contains(typeASInt))
+        {
+            tile = wallFull;
+        }
+        else if (WallBytes.wallBottmEightDirections.Contains(typeASInt))
+        {
+            tile = wallBottom;
+        }
+
+
+        if (tile != null)
+            PaintSingleTile(wallTilemap, tile, position);
+    }
 }
-    
