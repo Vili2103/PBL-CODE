@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4784323f84408c448aa2b60f8048110e, type: 3}
-  m_Name: SimpleRandomWalkParameters_BigDungeon
+  m_Name: CoridorFirst
   m_EditorClassIdentifier: 
-  loops: 60
-  stepsToTake: 60
+  loops: 20
+  stepsToTake: 20
   startRandomlyEachIteration: 0

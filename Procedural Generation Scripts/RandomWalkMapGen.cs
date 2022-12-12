@@ -26,7 +26,7 @@ public class RandomWalkMapGen : AbstractDungeonGen
         HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>(); // Hashset of positions where we need to draw tiles
         for (int i = 0; i < parameters.loops; i++)
         {
-            var path = ProceduralGenerationAlgorithms.SimpleRandomWalk(pos, parameters.walkLength); // We make a union between the taken path and the tile positions so there aren't gaps
+            var path = ProceduralGenerationAlgorithms.SimpleRandomWalk(pos, parameters.stepsToTake); // We make a union between the taken path and the tile positions so there aren't gaps
             floorPositions.UnionWith(path);// UnionWith is a method from the HashSet
             //We do this to not go over tiles multiple times :)
             if (parameters.startRandomlyEachIteration)
