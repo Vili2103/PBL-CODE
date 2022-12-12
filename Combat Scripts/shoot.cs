@@ -6,11 +6,18 @@ using UnityEngine.InputSystem;
 public class shoot : MonoBehaviour
 {
     public Transform shootingPoint;
-    public GameObject bulletPrefab;
+    [SerializeField]
+    private GameObject bulletPrefab;
+    [SerializeField] // Makes this visible in the inspector, even though it's private
+    private float coolDown = 0.0f;
+    coolDown*=50;
+    private int recharge = 0;
    
-    void FixedUpdate()
+   
+    void FixedUpdate() // FixedUpdate updates 50 times a second.
     {
-        if(Input.GetMouseButton(0) || Keyboard.current.spaceKey.wasPressedThisFrame) {
+           coolDown++; // this may be dumb and very inefficient but it's the only thing i could think of. 
+        if(Input.GetInput("Fire1") && recharge => coolDown){
             Instantiate(bulletPrefab,shootingPoint.position, transform.rotation);
         }
     }
