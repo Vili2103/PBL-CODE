@@ -17,6 +17,9 @@ public static class WallBytes
         0b0111
     };
 
+    
+
+
     public static HashSet<int> wallSideLeft = new HashSet<int>
     {
         0b0100

@@ -11,21 +11,28 @@ public class TileMaker : MonoBehaviour
     [SerializeField]
     private TileBase floorTiles, crackedFloor, veryCrackedFloor, wallTop, wallSideRight, wallSiderLeft, wallBottom, wallFull,
         wallInnerCornerDownLeft, wallInnerCornerDownRight,
-        wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
+        wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft, chest;
     [SerializeField]
-    private GameObject leftSideHitbox, rightSideHitbox, basicHitBox;
+    private GameObject leftSideHitbox, rightSideHitbox, basicHitBox, chestPrefab;
+
+
+    public HashSet<Vector2Int> wallPositions = new HashSet<Vector2Int>();
 
     public void PlaceFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
         PlaceTiles(floorPositions, floorTilemap, floorTiles);
+        
     }
 
     private void PlaceTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tiles)
     {
+       
         foreach (var pos in positions)  // The PlaceTiles method pretty much loops through the PlaceSingleTile method which places our tiles one at a time.
         {
             PlaceSingleTile(tilemap, tiles, pos, crackedFloor, veryCrackedFloor);  // CALLS THE OVERLOADED METHOD (THE ONE THAT TAKES MORE PARAMETERS)
+           
         }
+        PlacePrefabs();
     }
 
     internal void PaintSingleBasicWall(Vector2Int position, string binaryType)
@@ -63,13 +70,13 @@ public class TileMaker : MonoBehaviour
 
         if (tile != null)
         {
-            PaintSingleTile(wallTilemap, tile, position);
+            PlaceSingleTile(wallTilemap, tile, position);
             PlaceHitBox(hitbox, position);
+            wallPositions.Add(position);
         }
             
     }
-
-    private void PaintSingleTile(Tilemap tilemap, TileBase tile, Vector2Int position)
+    private void PlaceSingleTile(Tilemap tilemap, TileBase tile, Vector2Int position)
     {
         var tilePos = tilemap.WorldToCell((Vector3Int)position);
         tilemap.SetTile(tilePos, tile);
@@ -91,7 +98,13 @@ public class TileMaker : MonoBehaviour
         var tilePos = tilemap.WorldToCell((Vector3Int)pos);
         tilemap.SetTile(tilePos, tiles);
     }
-
+    protected void PlaceChest(Vector2Int chestPos)
+    {
+        var offset = new Vector3(0.5f, 0.5f, 0); //For some reason I need this because it places it in the middle of the tiles, not where it should.
+        var chestPosV3= wallTilemap.WorldToCell((Vector3Int)chestPos);
+        Instantiate(chestPrefab,chestPosV3+offset, transform.rotation);
+        
+    }
 
     public void ClearTiles()
     {
@@ -104,6 +117,13 @@ public class TileMaker : MonoBehaviour
         foreach (GameObject hitbox in GameObject.FindGameObjectsWithTag("Hitbox"))
         {
             DestroyImmediate(hitbox);
+        }
+    }
+    public void DeletePrefabs()
+    {
+        foreach (GameObject prefab in GameObject.FindGameObjectsWithTag("Prefab"))
+        {
+            DestroyImmediate(prefab);
         }
     }
 
@@ -159,19 +179,127 @@ public class TileMaker : MonoBehaviour
 
         if (tile != null)
         {
-            PaintSingleTile(wallTilemap, tile, position);
+            PlaceSingleTile(wallTilemap, tile, position);
           PlaceHitBox(hitbox, position);
 
-        }
-           
+        }      
     }
-
     private void PlaceHitBox(GameObject hitBox,Vector2Int position)
     {
         var wallPos = wallTilemap.WorldToCell((Vector3Int)position); // We just find where the tile where we should be placing the hitbbox should be
         // For some reason the hitbox does not appear directly on top of the tile so I needed to fiddle with the offsets of the hitbox prefabs
             Instantiate(hitBox,wallPos,transform.rotation); // This makes the inspector very very crowded but it's the best thing I can think of right now.
+    }
+    public void PlaceChests()
+    {
 
+        foreach (var room in CorridorFirstDungeonGenerator.rooms)
+        {
+            HashSet<Vector2Int> roomTiles = room.Value;
+            PlaceChestsPart2(roomTiles);
+
+        }
+    }
+
+    private void PlaceChestsPart2(HashSet<Vector2Int> roomTiles)
+    {
+        int minX = int.MaxValue;
+        int minY = int.MaxValue;
+        int maxY = int.MinValue;
+        int maxX = int.MinValue;
+        foreach (var tile in roomTiles)
+        {
+            if (tile.x < minX)
+                minX = tile.x;
+
+            if (tile.y < minY)
+                minY = tile.y;
+
+            if (tile.x > maxX)
+                maxX = tile.x;
+
+            if (tile.y > maxY)
+                maxY = tile.y;
+        }
+
+        Vector2Int chestPos = getRandomChestPos(minX, maxX, minY, maxY);
+
+        if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
+                                                                                                                                       //Its also very important that we check that the chest isn't a part of the corridor, so we don't block off rooms unintetionaly.
+        {
+            PlaceChest(chestPos);
+            Debug.Log(chestPos);
+        }
+        else
+        {
+            chestPos = getRandomChestPos(minX, maxX, minY, maxY);
+            if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
+            {
+                PlaceChest(chestPos);
+                Debug.Log(chestPos);
+            }
+            else
+            {
+                chestPos = getRandomChestPos(minX, maxX, minY, maxY);
+                if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
+                {
+                    PlaceChest(chestPos);
+                    Debug.Log(chestPos);
+                }
+                else
+                {
+                    chestPos = getRandomChestPos(minX, maxX, minY, maxY);
+                    if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
+                    {
+                        PlaceChest(chestPos);
+                        Debug.Log(chestPos);
+                    }
+                    else
+                    {
+                        chestPos = getRandomChestPos(minX, maxX, minY, maxY);
+                        if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
+                        {
+                            PlaceChest(chestPos);
+                            Debug.Log(chestPos);
+                        }
+                        else
+                        {
+                            chestPos = getRandomChestPos(minX, maxX, minY, maxY);
+                            if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
+                            {
+                                PlaceChest(chestPos);
+                                Debug.Log(chestPos);
+                            }
+                            else
+                            {
+                                chestPos = getRandomChestPos(minX, maxX, minY, maxY);
+                                if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
+                                {
+                                    PlaceChest(chestPos);
+                                    Debug.Log(chestPos);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+          //This is very very clunky but recursion causes stackoverflow and this works sooo yeah.
+            }
+     private Vector2Int getRandomChestPos(int minX, int maxX,int minY, int maxY)
+    {
+        int x = UnityEngine.Random.Range(minX, maxX);
+        int y = UnityEngine.Random.Range(minY, maxY);
+        Vector2Int chestPos = new Vector2Int(x, y);
+        return chestPos;
+    }
+
+    
+    public void PlacePrefabs()
+    {
+        PlaceChests();
+        //more to be added
     }
 }
 

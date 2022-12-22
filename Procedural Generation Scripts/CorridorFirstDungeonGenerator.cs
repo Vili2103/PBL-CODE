@@ -10,8 +10,12 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
     private int length = 14, corridorCount = 5;
     [SerializeField]
     [Range(0.1f,1)] // Sets a range for the roomPercent variable. It cannot be bigger than one since it is a %
-    private float roomPercent = 0.8f; //Chance to spawn a room where there is enough space to.
-     
+    private float roomPercent = 0.8f; //Chance to spawn a room where there is enough space to.  
+
+
+    public static Dictionary<Vector2Int, HashSet<Vector2Int>> rooms = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
+    public static HashSet<Vector2Int> corridorPositions = new HashSet<Vector2Int>();
+    
     protected override void RunPPG() // OVERRIDING AN ABSTRACT METHOD IS BASICALLY OVERLOADING BUT COOLER
     // SINCE WE DONT HAVE TO CHANGE THE PARAMETERS OR ANYTHING, BUT WE JUST CHANGE THE METHOD ALLTOGETHER.
     {
@@ -22,12 +26,12 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
     {
         HashSet<Vector2Int> floorPos = new HashSet<Vector2Int>();
         HashSet<Vector2Int> potentialRoomPos = new HashSet<Vector2Int>();
-        makeCorridors(floorPos, potentialRoomPos);
+            HashSet<Vector2Int> doorPositions = new HashSet<Vector2Int>();
+
+    makeCorridors(floorPos, potentialRoomPos,doorPositions);
 
         HashSet<Vector2Int> roomPos = CreateRooms(potentialRoomPos);
         
-
-
         List<Vector2Int> deadEnds = FindDeadEnds(floorPos);
 
         CreateRoomsAtDeadEnd(deadEnds, roomPos);
@@ -44,8 +48,9 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
         {
             if(roomPositions.Contains(pos) == false)
             {
-                var room = RunRandomWalk(randomWalkParams, pos);
+                var room = RunRandomWalk(randomWalkParams, pos); 
                 roomPositions.UnionWith(room);
+                rooms[pos] = room;
             }
         }
     }
@@ -64,7 +69,6 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
                     neighboursCount++;
                 }
                     
-                
             }
             if (neighboursCount==1)
             {
@@ -77,31 +81,59 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
 
     private HashSet<Vector2Int> CreateRooms(HashSet<Vector2Int> potentialRoomPos)
     {
+
         HashSet<Vector2Int> roomPositions = new HashSet<Vector2Int>();
         int roomCount = Mathf.RoundToInt(potentialRoomPos.Count * roomPercent); // WE MULTIPLY THE NUMBER OF POTENTIAL ROOMS BY THE ROOM SPAWN PERCENTAGE TO GET OUR ROOMCOUNT.
+        
         List<Vector2Int> roomsToCreate = potentialRoomPos.OrderBy(x => Guid.NewGuid()).Take(roomCount).ToList(); //Gui = Globaly Unique Identifier x=> is a LAMBDA expression
 
 
         foreach (var roomPos in roomsToCreate)
         {
             var room = RunRandomWalk(randomWalkParams, roomPos);
+            rooms[roomPos] = room; //Dictionary that stores Vector2Int values as the keys to our rooms. Very neat very nice this is how we divide each room!
             roomPositions.UnionWith(room); // BUILT IN HASHSET METHOD!!!! WOW!!!
+           
+           
         }
+     /*   Vector2Int roomPo = new Vector2Int(0, 0);
+
+        if (rooms.ContainsKey(roomPo))
+        {
+            HashSet<Vector2Int> roomTiles = rooms[roomPo];
+            foreach (Vector2Int tile in roomTiles)
+            {
+                Debug.Log(tile);
+            }
+        } */
+
         return roomPositions;
     }
 
-    private void makeCorridors(HashSet<Vector2Int> floorPositions, HashSet<Vector2Int> potentialRoomPos)
+    private void makeCorridors(HashSet<Vector2Int> floorPositions, HashSet<Vector2Int> potentialRoomPos,HashSet<Vector2Int>doorPositions)
     {
+
         //RANDOM WALK CORRIDORS WITH THE STARTING POINT BEING startPos
         var pos = startPos;
+
         potentialRoomPos.Add(pos);
 
         for (int i = 0; i < corridorCount; i++)
         {
+
             var corridor = ProceduralGenerationAlgorithms.RandomWalkCorridor(pos, length);
+            corridorPositions.UnionWith(corridor);
             pos = corridor[corridor.Count - 1];
+           
             potentialRoomPos.Add(pos);
+            if (i == 0)
+            {
+                doorPositions.UnionWith(corridor);
+            }
             floorPositions.UnionWith(corridor); //HASHSET BUILT IN METHOD WOW!!!
         }
     }
+  
+
+
 }

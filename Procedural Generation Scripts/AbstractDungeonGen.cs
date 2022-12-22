@@ -12,10 +12,14 @@ public abstract class AbstractDungeonGen : MonoBehaviour
 
     public void GenerateDungeon()
     {
+        ClearAll();
+        RunPPG();
+    }
+    public void ClearAll()
+    {
         tileMaker.ClearTiles();
         tileMaker.DeleteHitboxes();
-       
-        RunPPG();
+        tileMaker.DeletePrefabs();
     }
 
     protected abstract void RunPPG();

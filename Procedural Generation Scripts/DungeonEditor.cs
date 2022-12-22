@@ -21,5 +21,8 @@ public class DungeonEditor : Editor
         {
             generator.GenerateDungeon();
         }
+        if(GUILayout.Button("Clear Tiles")){
+            generator.ClearAll();
+        }
     }
 }
