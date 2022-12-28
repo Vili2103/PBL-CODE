@@ -6,7 +6,6 @@ using UnityEngine;
 
 public static class ProceduralGenerationAlgorithms
 {
-    
     public static HashSet<Vector2Int> SimpleRandomWalk(Vector2Int startPos, int stepsToTake)
     {
         /* We use a HashSet mainly to guarantee that all values are unique and that our agent does not “step” on the same tile twice. It also has the operations “UnionWith”, 
