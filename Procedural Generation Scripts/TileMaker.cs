@@ -13,7 +13,7 @@ public class TileMaker : MonoBehaviour
         wallInnerCornerDownLeft, wallInnerCornerDownRight,
         wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft, chest;
     [SerializeField]
-    private GameObject leftSideHitbox, rightSideHitbox, basicHitBox, chestPrefab,enemyPrefab;
+    private GameObject leftSideHitbox, rightSideHitbox, basicHitBox, chestPrefab,enemyPrefab,organizer;
     [SerializeField]
     private List<EnemyMaker> enemiesList = new List<EnemyMaker>();
 
@@ -103,7 +103,7 @@ public class TileMaker : MonoBehaviour
     {
         var offset = new Vector3(0.5f, 0.5f, 0); //For some reason I need this because it places it in the middle of the tiles, not where it should.
         var chestPosV3 = wallTilemap.WorldToCell((Vector3Int)chestPos);
-        Instantiate(chestPrefab, chestPosV3 + offset, transform.rotation);
+        Instantiate(chestPrefab, chestPosV3 + offset, transform.rotation,organizer.transform);
     }
 
     public void ClearTiles()
@@ -188,7 +188,8 @@ public class TileMaker : MonoBehaviour
     {
         var wallPos = wallTilemap.WorldToCell((Vector3Int)position); // We just find where the tile where we should be placing the hitbox should be
         // For some reason the hitbox does not appear directly on top of the tile so I needed to fiddle with the offsets of the hitbox prefabs
-        Instantiate(hitBox, wallPos, transform.rotation); // This makes the inspector very very crowded but it's the best thing I can think of right now.
+        Instantiate(hitBox, wallPos, transform.rotation,organizer.transform); // This makes the inspector very very crowded but it's the best thing I can think of right now.
+     
     }
     public void PlaceChests()
     {
@@ -219,7 +220,8 @@ public class TileMaker : MonoBehaviour
             while (hasChest == false)
             {
                 Vector2Int chestPos = getRandomPos(minX, maxX, minY, maxY);
-                if (CorridorFirstDungeonGenerator.startRoomPos.Contains(chestPos) == true)
+                if (CorridorFirstDungeonGenerator.startRoomPos.Contains(chestPos) == true || 
+                    CorridorFirstDungeonGenerator.bossRoomPos.Contains(chestPos)==true)
                 {
                     break;
                 }
@@ -246,7 +248,7 @@ public class TileMaker : MonoBehaviour
     public void PlacePrefabs()
     {
         PlaceChests();
-      // PlaceEnemies.placeEnemies(floorTilemap, wallTilemap, enemiesList); //Unity dies after spawing enemies because it isnt very optimmized!
+        // PlaceEnemies.placeEnemies(floorTilemap, wallTilemap, enemiesList); //Unity dies after spawing enemies because it isnt very optimmized!
         //more to be added
     }
    

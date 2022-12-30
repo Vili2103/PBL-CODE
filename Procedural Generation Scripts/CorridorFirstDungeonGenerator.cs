@@ -8,22 +8,27 @@ using UnityEngine.Tilemaps;
 public class CorridorFirstDungeonGenerator : RandomWalkMapGen
 {
     [SerializeField]
-    Tilemap spawnRoom;
+    private Grid grid;
+    [SerializeField]
+    Tilemap spawnRoom,bossRoom;
     [SerializeField]
     private int length = 14, corridorCount = 5;
     [SerializeField]
     [Range(0.1f,1)] // Sets a range for the roomPercent variable. It cannot be bigger than one since it is a %
     private float roomPercent = 0.8f; //Chance to spawn a room where there is enough space to.  
 
+   // private bool hasBossRoom = false;
+
 
     public static Dictionary<Vector2Int, HashSet<Vector2Int>> rooms = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
     public static HashSet<Vector2Int> corridorPositions = new HashSet<Vector2Int>();
-    public static HashSet<Vector2Int> startRoomPos = new HashSet<Vector2Int>();   
+    public static HashSet<Vector2Int> startRoomPos = new HashSet<Vector2Int>();
+    public static HashSet<Vector2Int> bossRoomPos = new HashSet<Vector2Int>();
     protected override void RunPPG() // OVERRIDING AN ABSTRACT METHOD IS BASICALLY OVERLOADING BUT COOLER
     // SINCE WE DONT HAVE TO CHANGE THE PARAMETERS OR ANYTHING, BUT WE JUST CHANGE THE METHOD ALLTOGETHER.
     {
         CorridorFirstGeneration();
-        setStartRoomPos(spawnRoom);
+        setStartRoomPos();
     }
 
     private void CorridorFirstGeneration()
@@ -39,6 +44,7 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
         List<Vector2Int> deadEnds = FindDeadEnds(floorPos);
 
         CreateRoomsAtDeadEnd(deadEnds, roomPos);
+
         floorPos.UnionWith(roomPos);
 
         tileMaker.PlaceFloorTiles(floorPos);
@@ -48,15 +54,19 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
 
     private void CreateRoomsAtDeadEnd(List<Vector2Int> deadEnds, HashSet<Vector2Int> roomPositions)
     {
-        foreach (var pos in deadEnds)
-        {
-            if(roomPositions.Contains(pos) == false)
+            foreach (var pos in deadEnds)
             {
-                var room = RunRandomWalk(randomWalkParams, pos); 
-                roomPositions.UnionWith(room);
-                rooms[pos] = room;
+                if (roomPositions.Contains(pos) == false)
+                {
+                    var room = RunRandomWalk(randomWalkParams, pos);
+                    roomPositions.UnionWith(room);
+                    rooms[pos] = room;
+
+                }
+        
+
             }
-        }
+      
     }
     private List<Vector2Int> FindDeadEnds(HashSet<Vector2Int> floorPos)
     {
@@ -77,39 +87,51 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
             {
                 deadEnds.Add(pos);
             }
-               
+
         }
         return deadEnds;
     }
     private HashSet<Vector2Int> CreateRooms(HashSet<Vector2Int> potentialRoomPos)
     {
-        setStartRoomPos(spawnRoom);
+        setStartRoomPos();
         HashSet<Vector2Int> roomPositions = new HashSet<Vector2Int>();
         foreach (var pos in startRoomPos)
         {
             roomPositions.UnionWith(startRoomPos);
-           rooms[pos] = startRoomPos;// No need to add it to the dictionary. It would only add a chest and be annoying.
-
+            rooms[pos] = startRoomPos;
             if (potentialRoomPos.Contains(pos))
                 potentialRoomPos.Remove(pos); // To ensure that we dont spawn another room on top of our spawn. 
         }
-        
 
         int roomCount = Mathf.RoundToInt(potentialRoomPos.Count * roomPercent); // WE MULTIPLY THE NUMBER OF POTENTIAL ROOMS BY THE ROOM SPAWN PERCENTAGE TO GET OUR ROOMCOUNT.
+
+        List<Vector2Int> roomsToCreate = potentialRoomPos.OrderBy(x => Guid.NewGuid()).Take(roomCount).ToList(); //Gui = Globaly Unique Identifier x=> is a LAMBDA expression 
         
-        List<Vector2Int> roomsToCreate = potentialRoomPos.OrderBy(x => Guid.NewGuid()).Take(roomCount).ToList(); //Gui = Globaly Unique Identifier x=> is a LAMBDA expression
-        
+        Vector2Int bossPos = getMaxDistance(roomsToCreate);
+        Vector3 bossRoomPosV3 = new Vector3(bossPos.x, bossPos.y, 0);
+        roomsToCreate.Remove(bossPos);
+        bossRoom.transform.position = bossRoomPosV3; //We move the bossroom and then draw over it so that it connects to corridors etc.
+       // Instantiate(bossRoom,bossRoomPosV3, transform.rotation, grid.transform); // We set grid as the parent or else the room doesn't spawn (unity requires it)
+        setBossRoomPos();
         
 
-        foreach (var roomPos in roomsToCreate)
+        foreach (var pos in bossRoomPos)
         {
-            var room = RunRandomWalk(randomWalkParams, roomPos);
-            rooms[roomPos] = room; //Dictionary that stores Vector2Int values as the keys to our rooms. Very neat very nice this is how we divide each room!
-            roomPositions.UnionWith(room); // BUILT IN HASHSET METHOD!!!! WOW!!!
-           
+            roomPositions.UnionWith(bossRoomPos);
+            rooms[pos] = bossRoomPos;
+            if (roomsToCreate.Contains(pos))
+                roomsToCreate.Remove(pos); //So we don't have multiple rooms on top of each other
+        }
+
+        foreach (var roomPos in roomsToCreate) {
+            
+                var room = RunRandomWalk(randomWalkParams, roomPos);
+                rooms[roomPos] = room; //Dictionary that stores Vector2Int values as the keys to our rooms. Very neat very nice this is how we divide each room!
+                roomPositions.UnionWith(room); // BUILT IN HASHSET METHOD!!!! WOW!!!
         }
         return roomPositions;
     }
+
 
     private void makeCorridors(HashSet<Vector2Int> floorPositions, HashSet<Vector2Int> potentialRoomPos,HashSet<Vector2Int>doorPositions,Tilemap startRoomTilemap)
     {
@@ -133,28 +155,54 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
             floorPositions.UnionWith(corridor); //HASHSET BUILT IN METHOD WOW!!!
         }
     }
-    private void setStartRoomPos(Tilemap startRoomTilemap)
+    private void setStartRoomPos()
     {
-        for (int x = -15; x < 20; x++)
+        for (int x = -50; x < 50; x++)
         {
-            for (int y = -20; y < 20; y++)
+            for (int y = -50; y < 50; y++)
             {
-                Vector3Int selectedTile = (new Vector3Int(x, y, (int)startRoomTilemap.transform.position.y));
-                Vector3 place = startRoomTilemap.CellToWorld(selectedTile);
-                if (startRoomTilemap.HasTile(selectedTile))
+                Vector3Int selectedTile = (new Vector3Int(x, y, (int)spawnRoom.transform.position.y));
+                Vector3 place = spawnRoom.CellToWorld(selectedTile);
+                if (spawnRoom.HasTile(selectedTile))
                 {
                     //Tile at "place"
                     Vector2 pos = (Vector2)place;
                     Vector2Int posInt = Vector2Int.RoundToInt(pos);
                     startRoomPos.Add(posInt);
                 }
-
             }
         }
-      
     }
-    
-  
+    private void setBossRoomPos()
+    {
+        foreach (var position in bossRoom.cellBounds.allPositionsWithin) // might be a bit inefficient but it works so yeah.
+        {
+            
+            if (bossRoom.HasTile(position))
+            {
+                Vector3 pos = bossRoom.CellToWorld(position);
+                Vector2 pos2 = pos;
+                Vector2Int pos2Int = Vector2Int.RoundToInt(pos2);
+                bossRoomPos.Add(pos2Int);
+            }
+        }
 
-
+    }
+    private Vector2Int getMaxDistance(List<Vector2Int> roomsToCreate) // We find the most distant room from the spawn. We make it the boss room later in the script
+    {
+        Vector2Int startPos = new Vector2Int(0, 0);
+        float[] dist = new float[roomsToCreate.Count];
+        int i = 0;
+        Dictionary<float, Vector2Int> distances = new Dictionary<float, Vector2Int>();
+        foreach (var roomPos in roomsToCreate)
+        {
+            dist[i] = Vector2Int.Distance(roomPos, startPos);
+            distances[dist[i]] = roomPos;
+            i++;
+        }
+        Array.Sort(dist);
+        Array.Reverse(dist);
+        return distances[dist[0]];
+       
+    }
 }
