@@ -9,8 +9,10 @@ public static class WallMaker
     {
         var wallPos = FindWallsInDirections(floorPositions, Direction2D.dirList);
         var cornerPos = FindWallsInDirections(floorPositions, Direction2D.diagonalDirList);
+        
         CreateBasicWall(tileMaker, wallPos, floorPositions);
-        CreateCornerWalls(tileMaker, cornerPos, floorPositions);
+        CreateCornerWalls(tileMaker, cornerPos, floorPositions);    
+
         // THIS WHOLE SCRIPT SERVES TO CALCULATE WHAT TILE WE ARE SUPPOSED TO HAVE AT OUR SPECIFIC LOCATION. 
     }
 

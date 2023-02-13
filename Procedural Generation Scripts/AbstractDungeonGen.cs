@@ -14,12 +14,26 @@ public abstract class AbstractDungeonGen : MonoBehaviour
     {
         ClearAll();
         RunPPG();
+       
+
+
     }
     public void ClearAll()
     {
         tileMaker.ClearTiles();
         tileMaker.DeleteHitboxes();
         tileMaker.DeletePrefabs();
+        CorridorFirstDungeonGenerator.roomPositions.Clear();
+        CorridorFirstDungeonGenerator.floorPos.Clear();
+        CorridorFirstDungeonGenerator.startRoomPos.Clear();
+        CorridorFirstDungeonGenerator.corridorPositions.Clear();
+        CorridorFirstDungeonGenerator.bossRoomPos.Clear();
+        CorridorFirstDungeonGenerator.doorPositions.Clear();
+        CorridorFirstDungeonGenerator.rooms.Clear();
+        
+        
+        //Earlier Iterations used to stack on top of each other
+
     }
 
     protected abstract void RunPPG();

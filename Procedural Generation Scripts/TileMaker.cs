@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 public class TileMaker : MonoBehaviour
 {
     [SerializeField]  //this alows us to see the tilemap in the unity inspector
-    private Tilemap floorTilemap, wallTilemap; // Different Tilemap so  we can impelement hitboxes.
+    private Tilemap floorTilemap, wallTilemap; // Different Tilemaps so  we can impelement hitboxes.
     [SerializeField]
     private TileBase floorTiles, crackedFloor, veryCrackedFloor, wallTop, wallSideRight, wallSiderLeft, wallBottom, wallFull,
         wallInnerCornerDownLeft, wallInnerCornerDownRight,
@@ -17,9 +17,11 @@ public class TileMaker : MonoBehaviour
     [SerializeField]
     private List<EnemyMaker> enemiesList = new List<EnemyMaker>();
 
+    public static HashSet<Vector2Int> wallPositions = new HashSet<Vector2Int>();
 
-    public HashSet<Vector2Int> wallPositions = new HashSet<Vector2Int>();
-
+    public HashSet<Vector2Int> wallSet = new HashSet<Vector2Int>();
+    public HashSet<Vector2Int> halfSet = new HashSet<Vector2Int>();
+    public Dictionary<Vector2Int, GameObject> wallDict = new Dictionary<Vector2Int, GameObject>();
     public void PlaceFloorTiles(IEnumerable<Vector2Int> floorPositions)
     {
         PlaceTiles(floorPositions, floorTilemap, floorTiles);   
@@ -34,6 +36,8 @@ public class TileMaker : MonoBehaviour
 
         }
         PlacePrefabs();
+      
+        
     }
 
     internal void PaintSingleBasicWall(Vector2Int position, string binaryType)
@@ -41,39 +45,50 @@ public class TileMaker : MonoBehaviour
         int typeAsInt = Convert.ToInt32(binaryType, 2);
         TileBase tile = null;
         GameObject hitbox = null;
+       
+       
         if (WallBytes.wallTop.Contains(typeAsInt))
         {
             tile = wallTop;
+          hitbox = basicHitBox;
+          
+            
+        }
+        
+       else if (WallBytes.wallBottm.Contains(typeAsInt) )
+        {
+            tile = wallBottom;
             hitbox = basicHitBox;
-
+           
+        }
+        else if (WallBytes.wallFull.Contains(typeAsInt))
+        {
+            tile = wallFull;
+            hitbox = basicHitBox;
+         
         }
         else if (WallBytes.wallSideRight.Contains(typeAsInt))
         {
             tile = wallSideRight;
             hitbox = rightSideHitbox;
+            halfSet.Add(position);
 
         }
         else if (WallBytes.wallSideLeft.Contains(typeAsInt))
         {
             tile = wallSiderLeft;
             hitbox = leftSideHitbox;
-        }
-        else if (WallBytes.wallBottm.Contains(typeAsInt))
-        {
-            tile = wallBottom;
-            hitbox = basicHitBox;
-        }
-        else if (WallBytes.wallFull.Contains(typeAsInt))
-        {
-            tile = wallFull;
-            hitbox = basicHitBox;
+            halfSet.Add(position);
+        
         }
 
         if (tile != null)
         {
+            if (hitbox == basicHitBox)
+                wallSet.Add(position);
             PlaceSingleTile(wallTilemap, tile, position);
             PlaceHitBox(hitbox, position);
-            wallPositions.Add(position);
+            
         }
 
     }
@@ -101,13 +116,14 @@ public class TileMaker : MonoBehaviour
     }
     protected void PlaceChest(Vector2Int chestPos)
     {
-        var offset = new Vector3(0.5f, 0.5f, 0); //For some reason I need this because it places it in the middle of the tiles, not where it should.
+        var offset = new Vector3(0.5f, 0.5f, -5f); //For some reason I need this because it places it in the middle of the tiles, not where it should.
         var chestPosV3 = wallTilemap.WorldToCell((Vector3Int)chestPos);
         Instantiate(chestPrefab, chestPosV3 + offset, transform.rotation,organizer.transform);
     }
 
     public void ClearTiles()
     {
+       
         floorTilemap.ClearAllTiles();
         wallTilemap.ClearAllTiles();
     }
@@ -118,6 +134,7 @@ public class TileMaker : MonoBehaviour
         {
             DestroyImmediate(hitbox);
         }
+      
     }
     public void DeletePrefabs()
     {
@@ -130,28 +147,32 @@ public class TileMaker : MonoBehaviour
     internal void PlaceSingleCornerWall(Vector2Int position, string binaryType)
     {
         /* WE CHECK THE POSITIONS OF THE FLOORS AND WALLS THAT NEIGHBOUR OUR GIVEN TILE. THEN, WE SEE WHAT TILE WE SHOULD PLACE (FROM Wall Bytes) */
-
         int typeASInt = Convert.ToInt32(binaryType, 2);
         TileBase tile = null;
         GameObject hitbox = null;
+      
+       
 
         if (WallBytes.wallInnerCornerDownLeft.Contains(typeASInt))
         {
             tile = wallInnerCornerDownLeft;
-            hitbox = basicHitBox;
+            hitbox = leftSideHitbox;
+            halfSet.Add(position);
 
         }
         else if (WallBytes.wallInnerCornerDownRight.Contains(typeASInt))
         {
             tile = wallInnerCornerDownRight;
-            hitbox = basicHitBox;
+            hitbox = rightSideHitbox;
+            halfSet.Add(position);
+
         }
-        else if (WallBytes.wallDiagonalCornerDownLeft.Contains(typeASInt))
+        else if (WallBytes.wallDiagonalCornerDownLeft.Contains(typeASInt) ) // We need to check since the weirdWall messed up the hitboxes for a while
         {
             tile = wallDiagonalCornerDownLeft;
             hitbox = basicHitBox;
         }
-        else if (WallBytes.wallDiagonalCornerDownRight.Contains(typeASInt))
+        else if (WallBytes.wallDiagonalCornerDownRight.Contains(typeASInt) )
         {
             tile = wallDiagonalCornerDownRight;
             hitbox = basicHitBox;
@@ -161,34 +182,48 @@ public class TileMaker : MonoBehaviour
             hitbox = basicHitBox;
             tile = wallDiagonalCornerUpRight;
         }
-        else if (WallBytes.wallDiagonalCornerUpLeft.Contains(typeASInt))
+        else if (WallBytes.wallDiagonalCornerUpLeft.Contains(typeASInt) )
         {
             tile = wallDiagonalCornerUpLeft;
             hitbox = basicHitBox;
         }
-        else if (WallBytes.wallFullEightDirections.Contains(typeASInt))
+       else if (WallBytes.wallFullEightDirections.Contains(typeASInt))
         {
             tile = wallFull;
             hitbox = basicHitBox;
         }
-        else if (WallBytes.wallBottmEightDirections.Contains(typeASInt))
+        else if (WallBytes.wallBottmEightDirections.Contains(typeASInt) )
         {
             tile = wallBottom;
             hitbox = basicHitBox;
-        }
+        } 
 
         if (tile != null)
         {
+            if (hitbox == basicHitBox)
+                wallSet.Add(position);
             PlaceSingleTile(wallTilemap, tile, position);
             PlaceHitBox(hitbox, position);
-
+           
         }
     }
     private void PlaceHitBox(GameObject hitBox, Vector2Int position)
     {
         var wallPos = wallTilemap.WorldToCell((Vector3Int)position); // We just find where the tile where we should be placing the hitbox should be
         // For some reason the hitbox does not appear directly on top of the tile so I needed to fiddle with the offsets of the hitbox prefabs
-        Instantiate(hitBox, wallPos, transform.rotation,organizer.transform); // This makes the inspector very very crowded but it's the best thing I can think of right now.
+       
+        var box = Instantiate(hitBox, wallPos, transform.rotation,organizer.transform); // This makes the inspector very very crowded but it's the best thing I can think of right now.
+        if (wallDict.ContainsKey(position)) {
+            GameObject.DestroyImmediate(wallDict[position]);
+            wallDict.Remove(position);
+            wallDict.Add(position,box);
+        }
+        else
+        {
+            wallDict.Add(position, box);
+        }
+       
+        
      
     }
     public void PlaceChests()
@@ -219,24 +254,37 @@ public class TileMaker : MonoBehaviour
 
             while (hasChest == false)
             {
+                int blockedTiles = 0;
                 Vector2Int chestPos = getRandomPos(minX, maxX, minY, maxY);
                 if (CorridorFirstDungeonGenerator.startRoomPos.Contains(chestPos) == true || 
                     CorridorFirstDungeonGenerator.bossRoomPos.Contains(chestPos)==true)
                 {
                     break;
                 }
+
+                foreach(var dir in Direction2D.dirList)
+                {
+                    if (wallTilemap.HasTile((Vector3Int)(chestPos + dir)))
+                        blockedTiles++; // So we dont spawn chests surrounded by walls. 
+
+                }
+
                 if (floorTilemap.HasTile((Vector3Int)chestPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(chestPos) == false) // check if the position where the chest is being spawned is a floor tile
                  //Its also very important that we check that the chest isn't a part of the corridor, so we don't block off rooms unintetionaly.
                 {
-                    PlaceChest(chestPos);
-                    hasChest = true;
+                    if (blockedTiles < 2)
+                    {
+                        PlaceChest(chestPos);
+                        hasChest = true;
+                    }
+                   
                 }
             }
             hasChest = false;
-            //This is a bit clunky but recursion causes stackoverflow and this works sooo yeah.
+            
         }
     }
-
+    
      public static Vector2Int getRandomPos(int minX, int maxX,int minY, int maxY)
     {
         int x = UnityEngine.Random.Range(minX, maxX);
@@ -244,11 +292,13 @@ public class TileMaker : MonoBehaviour
         Vector2Int pos = new Vector2Int(x, y);
         return pos;
     }
+    
 
     public void PlacePrefabs()
     {
         PlaceChests();
-        // PlaceEnemies.placeEnemies(floorTilemap, wallTilemap, enemiesList); //Unity dies after spawing enemies because it isnt very optimmized!
+        
+       //  PlaceEnemies.placeEnemies(floorTilemap, wallTilemap, enemiesList); //Unity dies after spawing enemies because it isnt very optimmized!
         //more to be added
     }
    
