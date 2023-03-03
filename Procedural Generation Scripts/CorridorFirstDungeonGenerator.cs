@@ -12,28 +12,26 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
     [SerializeField]
     Tilemap spawnRoom, bossRoom, wallTilemap;
     [SerializeField]
-    private int length = 14, corridorCount = 5;
+    private int length, corridorCount;
     [SerializeField]
-    [Range(0.1f, 1)] // Sets a range for the roomPercent variable. It cannot be bigger than one since it is a %
-    private float roomPercent = 0.8f; //Chance to spawn a room where there is enough space to.  
-    [SerializeField]
-    GameObject doorPrefab, organizer;
+    GameObject doorPrefab,organizer;
 
     public static HashSet<Vector2Int> roomPositions = new HashSet<Vector2Int>();
 
     public static HashSet<Vector2Int> doorPositions = new HashSet<Vector2Int>();
     public static HashSet<Vector2Int> floorPos = new HashSet<Vector2Int>();
+    public static HashSet<Vector2Int> rotatedDoorPositions = new HashSet<Vector2Int>();
 
     public static Dictionary<Vector2Int, HashSet<Vector2Int>> rooms = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
     public static HashSet<Vector2Int> corridorPositions = new HashSet<Vector2Int>();
     public static HashSet<Vector2Int> startRoomPos = new HashSet<Vector2Int>();
     public static HashSet<Vector2Int> bossRoomPos = new HashSet<Vector2Int>();
 
-    protected override void RunPPG() // OVERRIDING AN ABSTRACT METHOD IS BASICALLY OVERLOADING BUT COOLER
-    // SINCE WE DONT HAVE TO CHANGE THE PARAMETERS OR ANYTHING, BUT WE JUST CHANGE THE METHOD ALLTOGETHER.
-    {
+
+    protected override void RunPPG(){
         CorridorFirstGeneration();
-        getPotentialDoorPositions();
+        //getPotentialDoorPositions(); // Needs major changes so that it can finally work. Work in progress!!
+        
     }
 
     private void CorridorFirstGeneration()
@@ -107,7 +105,7 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
                 potentialRoomPos.Remove(pos); // To ensure that we dont spawn another room on top of our spawn. 
         }
 
-        int roomCount = Mathf.RoundToInt(potentialRoomPos.Count * roomPercent); // WE MULTIPLY THE NUMBER OF POTENTIAL ROOMS BY THE ROOM SPAWN PERCENTAGE TO GET OUR ROOMCOUNT.
+        int roomCount = Mathf.RoundToInt(potentialRoomPos.Count);
 
         List<Vector2Int> roomsToCreate = potentialRoomPos.OrderBy(x => Guid.NewGuid()).Take(roomCount).ToList(); //Gui = Globaly Unique Identifier x=> is a LAMBDA expression 
 
@@ -212,47 +210,66 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
         return distances[dist[0]];
 
     }
-     public void getPotentialDoorPositions() 
-      {
-         Vector2Int up = new Vector2Int(0, 1);
-         Vector2Int down = new Vector2Int(0, -1);
-         Vector2Int left = new Vector2Int(-1, 0);
-         Vector2Int right = new Vector2Int(1, 0);
-          foreach (var pos in corridorPositions)
-          {
+    public void getPotentialDoorPositions()
+    {
+        Vector2Int up = new Vector2Int(0, 1);
 
-              if ((!floorPos.Contains(pos + up) && !floorPos.Contains(pos + down)) &&(!roomPositions.Contains(pos+up)||!roomPositions.Contains(pos+down)))
-              {
-                  if (roomPositions.Contains(pos + left + down) || roomPositions.Contains(pos + left + up) || roomPositions.Contains(pos + right + down)
-                      || roomPositions.Contains(pos + right + up))//This exists so we don't spawn a door on every corridor tile that is not in a room.
-                  { 
-                      if(!doorPositions.Contains(pos+down+down) && !doorPositions.Contains(pos + up + up)&& !doorPositions.Contains(pos + left + left)
-                          && !doorPositions.Contains(pos + right + right))
-                      doorPositions.Add(pos);
-                  }
-              }
-              else if ((!floorPos.Contains(pos + left) && !floorPos.Contains(pos + right)) && (!roomPositions.Contains(pos + left) || !roomPositions.Contains(pos + right)))
-              {
-                  if (roomPositions.Contains(pos + left + down) || roomPositions.Contains(pos + left + up) || roomPositions.Contains(pos + right + down)
-                     || roomPositions.Contains(pos + right + up))
-                      doorPositions.Add(pos);
-              }
+        Vector2Int down = new Vector2Int(0, -1);
 
-              }
-         // PlaceDoors();
-      } 
+        Vector2Int left = new Vector2Int(-1, 0);
 
+        Vector2Int right = new Vector2Int(1, 0);
+
+        var offset = new Vector3(0.5f, 0.5f, 0);
+
+        foreach (var pos in corridorPositions)
+        {
+            Vector3 posV3 = new Vector3(pos.x, pos.y, 0);
+
+            if ((!floorPos.Contains(pos + up) && !floorPos.Contains(pos + down)) && (!roomPositions.Contains(pos + up) || !roomPositions.Contains(pos + down)))
+            {
+                if (roomPositions.Contains(pos + left + down) || roomPositions.Contains(pos + left + up) || roomPositions.Contains(pos + right + down)
+
+                    || roomPositions.Contains(pos + right + up))//This exists so we don't spawn a door on every corridor tile that is not in a room.
+                {
+                    if (!doorPositions.Contains(pos + down + down) && !doorPositions.Contains(pos + up + up) && !doorPositions.Contains(pos + left + left)
+
+                        && !doorPositions.Contains(pos + right + right))
+                        doorPositions.Add(pos);
+
+
+                }
+            }
+            else if ((!floorPos.Contains(pos + left) && !floorPos.Contains(pos + right)) && (!roomPositions.Contains(pos + left) || !roomPositions.Contains(pos + right)))
+            {
+                if (roomPositions.Contains(pos + left + down) || roomPositions.Contains(pos + left + up) || roomPositions.Contains(pos + right + down)
+                   || roomPositions.Contains(pos + right + up))
+                    rotatedDoorPositions.Add(pos);
+
+
+            }
+
+        }
+        PlaceDoors();
+    }
 
     public void PlaceDoors()
     {
+        var offset = new Vector3(0.5f, 0.5f, 0);
         foreach (var pos in CorridorFirstDungeonGenerator.doorPositions)
         {
-            var offset = new Vector3(0.5f, 0.5f, 0);
-            
+
             Vector3 posV3 = new Vector3(pos.x, pos.y, 0);
-            Instantiate(doorPrefab, posV3+offset, transform.rotation, organizer.transform);
-            
+            Instantiate(doorPrefab, posV3 + offset, Quaternion.Euler(0f, 0f, 90), organizer.transform);
+
+
+        }
+        foreach (var pos in rotatedDoorPositions)
+        {
+            Vector3 posV3 = new Vector3(pos.x, pos.y, 0);
+            Instantiate(doorPrefab, posV3 + offset, transform.rotation, organizer.transform);
         }
     }
+
 
 }

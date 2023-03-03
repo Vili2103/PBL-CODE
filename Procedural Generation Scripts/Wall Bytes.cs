@@ -28,7 +28,7 @@ public static class WallBytes
     public static HashSet<int> wallSideRight = new HashSet<int>
     {
         0b0001,
-        0b0101
+       0b0101
     };
 
     public static HashSet<int> wallBottm = new HashSet<int>
@@ -107,7 +107,7 @@ public static class WallBytes
     {
         0b1101,
         0b0101,
-        0b1101,
+       0b1101,
         0b1001
 
     };
@@ -154,6 +154,25 @@ public static class WallBytes
     public static HashSet<int> wallBottmEightDirections = new HashSet<int>
     {
         0b01000001
+    };
+
+    public static HashSet<int> wallBottomColumn = new HashSet<int>()
+    {
+        0b0111,
+        0b0010
+    };
+
+    public static HashSet<int> wallMidColumn = new HashSet<int>()
+    {
+        0b0101,
+        0b0000,
+        0b0100
+        
+    };
+
+    public static HashSet<int> wallTopColumn = new HashSet<int>()
+    {
+        0b1101
     };
 
 }

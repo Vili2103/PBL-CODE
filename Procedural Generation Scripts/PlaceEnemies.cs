@@ -6,14 +6,14 @@ using UnityEngine.Tilemaps;
 
 public class PlaceEnemies : TileMaker
 {
-   
-    public static void placeEnemies(Tilemap floorTilemap,Tilemap wallTilemap,List<EnemyMaker>enemiesList)
+    public static HashSet<Vector2Int> enemyPositions = new HashSet<Vector2Int>();
+    public static void placeEnemies(Tilemap floorTilemap,Tilemap wallTilemap,List<EnemyMaker>enemiesList,GameObject organizer)
     {
         foreach (var room in CorridorFirstDungeonGenerator.rooms)
         {
             HashSet<Vector2Int> roomTiles = room.Value;
             int enemiesInRoom = 0;
-            int enemiesToHaveInRoom = UnityEngine.Random.Range(3, 5); //Placeholder numbers
+            int enemiesToHaveInRoom = UnityEngine.Random.Range(roomTiles.Count/65, roomTiles.Count/50); //Placeholder numbers, but we want it to scale with room size.
             int minX = int.MaxValue;
             int minY = int.MaxValue;
             int maxY = int.MinValue;
@@ -36,11 +36,15 @@ public class PlaceEnemies : TileMaker
             while (enemiesInRoom < enemiesToHaveInRoom)
             {
                 Vector2Int enemyPos = TileMaker.getRandomPos(minX, maxX, minY, maxY);
-                if (floorTilemap.HasTile((Vector3Int)enemyPos) && CorridorFirstDungeonGenerator.corridorPositions.Contains(enemyPos) == false) // check if the position where the chest is being spawned is a floor tile
+                if (CorridorFirstDungeonGenerator.bossRoomPos.Contains(enemyPos) || CorridorFirstDungeonGenerator.startRoomPos.Contains(enemyPos))
+                    break;
+                if (floorTilemap.HasTile((Vector3Int)enemyPos) && !CorridorFirstDungeonGenerator.corridorPositions.Contains(enemyPos) && !TileMaker.prefabPositions.Contains(enemyPos) && !enemyPositions.Contains(enemyPos)) // check if the position where the chest is being spawned is a floor tile
                 //Its also very important that we check that the chest isn't a part of the corridor, so we don't block off rooms unintetionaly.
                 {
-                    PlaceEnemy(enemyPos,wallTilemap,getRandomEnemy(enemiesList));
+                    PlaceEnemy(enemyPos,wallTilemap,getRandomEnemy(enemiesList),organizer);
                     enemiesInRoom++;
+                    enemyPositions.Add(enemyPos);
+                  
                 }
             }
             enemiesInRoom = 0;
@@ -70,10 +74,14 @@ public class PlaceEnemies : TileMaker
         return selectedEnemy;
     }
 
-    private static void PlaceEnemy(Vector2Int enemyPos,Tilemap wallTilemap,GameObject enemyPrefab)
+    private static void PlaceEnemy(Vector2Int enemyPos,Tilemap wallTilemap,GameObject enemyPrefab, GameObject organizer)
     {
-        var offset = new Vector3(0, 0, 0); //For some reason I need this because it places it in the middle of the tiles, not where it should.
+        var offset = new Vector3(0.5f, 0.5f, -1); //For some reason I need this because it places it in the middle of the tiles, not where it should.
         var enemyPosV3 = wallTilemap.WorldToCell((Vector3Int)enemyPos);
-        Instantiate(enemyPrefab, enemyPosV3 + offset, enemyPrefab.transform.rotation);
+        Instantiate(enemyPrefab, enemyPosV3 + offset, enemyPrefab.transform.rotation,organizer.transform);
+    }
+    public static void clearSet()
+    {
+        enemyPositions.Clear();
     }
 }

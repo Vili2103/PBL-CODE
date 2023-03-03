@@ -14,9 +14,7 @@ public abstract class AbstractDungeonGen : MonoBehaviour
     {
         ClearAll();
         RunPPG();
-       
-
-
+    
     }
     public void ClearAll()
     {
@@ -29,9 +27,9 @@ public abstract class AbstractDungeonGen : MonoBehaviour
         CorridorFirstDungeonGenerator.corridorPositions.Clear();
         CorridorFirstDungeonGenerator.bossRoomPos.Clear();
         CorridorFirstDungeonGenerator.doorPositions.Clear();
+        CorridorFirstDungeonGenerator.rotatedDoorPositions.Clear();
         CorridorFirstDungeonGenerator.rooms.Clear();
-        
-        
+        PlaceEnemies.clearSet();
         //Earlier Iterations used to stack on top of each other
 
     }
