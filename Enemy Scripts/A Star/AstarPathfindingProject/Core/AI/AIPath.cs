@@ -235,7 +235,6 @@ namespace Pathfinding {
 		/// <summary>\copydoc Pathfinding::IAstarAI::canMove</summary>
 		bool IAstarAI.canMove { get { return canMove; } set { canMove = value; } }
 
-		//public bool isInRange = false;
 		#endregion
 
 		/// <summary>\copydoc Pathfinding::IAstarAI::GetRemainingPath</summary>
@@ -261,28 +260,15 @@ namespace Pathfinding {
 			reachedEndOfPath = false;
 		}
 
-		private void OnTriggerEnter2D(Collider2D collision)
-		{
-			if (collision.gameObject.CompareTag("Player"))
-				canMove = true;
-		}
-		private void OnTriggerExit2D(Collider2D collision)
-		{
-			if (collision.gameObject.CompareTag("Player"))
-				canMove = false;
-		}
-
-        
-
-        /// <summary>
-        /// The end of the path has been reached.
-        /// If you want custom logic for when the AI has reached it's destination add it here. You can
-        /// also create a new script which inherits from this one and override the function in that script.
-        ///
-        /// This method will be called again if a new path is calculated as the destination may have changed.
-        /// So when the agent is close to the destination this method will typically be called every <see cref="repathRate"/> seconds.
-        /// </summary>
-        public virtual void OnTargetReached () {
+		/// <summary>
+		/// The end of the path has been reached.
+		/// If you want custom logic for when the AI has reached it's destination add it here. You can
+		/// also create a new script which inherits from this one and override the function in that script.
+		///
+		/// This method will be called again if a new path is calculated as the destination may have changed.
+		/// So when the agent is close to the destination this method will typically be called every <see cref="repathRate"/> seconds.
+		/// </summary>
+		public virtual void OnTargetReached () {
 		}
 
 		/// <summary>

@@ -14,7 +14,7 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
     [SerializeField]
     private int length, corridorCount;
     [SerializeField]
-    GameObject doorPrefab,organizer, bigDoorPrefab;
+    GameObject doorPrefab, organizer, bigDoorPrefab;
 
     public static HashSet<Vector2Int> roomPositions = new HashSet<Vector2Int>();
 
@@ -28,10 +28,11 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
     public static HashSet<Vector2Int> bossRoomPos = new HashSet<Vector2Int>();
 
 
-    protected override void RunPPG(){
+    protected override void RunPPG()
+    {
         CorridorFirstGeneration();
-        getPotentialDoorPositions(); // Needs major changes so that it can finally work. Work in progress!!
-        
+     //   getPotentialDoorPositions(); // Needs major changes so that it can finally work. Work in progress!!
+
     }
 
     private void CorridorFirstGeneration()
@@ -268,13 +269,14 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
         bool upMost = false;
 
         var offset = new Vector3(0.5f, 0.5f, 0);
-        foreach(var startPos in rooms.Keys) {
+        foreach (var startPos in rooms.Keys)
+        {
             leftMost = false;
             rightMost = false;
             downMost = false;
             upMost = false;
             set.Clear();
-            foreach(var dir in Direction2D.dirList)
+            foreach (var dir in Direction2D.dirList)
             {
                 if (corridorPositions.Contains(startPos + dir))
                 {
@@ -286,9 +288,9 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
                         downMost = true;
                     else rightMost = true;
 
-                    foreach(var pos in doorPositions)
+                    foreach (var pos in doorPositions)
                     {
-                        foreach(var direction in Direction2D.dirList)
+                        foreach (var direction in Direction2D.dirList)
                         {
                             if (rooms[startPos].Contains(pos + dir))
                             {
@@ -301,25 +303,25 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
             }
             if (leftMost == true)
             {
-                var doorpos = findMostPos(set,left);
+                var doorpos = findMostPos(set, left);
                 actualDoorPos.Add(doorpos);
             }
-            if(rightMost == true)
+            if (rightMost == true)
             {
                 var doorpos = findMostPos(set, right);
                 actualDoorPos.Add(doorpos);
             }
-            if(upMost == true)
+            if (upMost == true)
             {
                 var doorPos = findMostPos(set, up);
                 actualDoorPos.Add(doorPos);
             }
-            if(downMost == true)
+            if (downMost == true)
             {
                 var doorPos = findMostPos(set, down);
                 actualDoorPos.Add(doorPos);
             }
-            
+
 
         }
 
@@ -328,19 +330,19 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
         {
 
             Vector3 posV3 = new Vector3(pos.x, pos.y, 0);
-            if(TileMaker.halfSet.Contains(pos+left-up) && TileMaker.halfSet.Contains(pos+right-up))
+            if (TileMaker.halfSet.Contains(pos + left - up) && TileMaker.halfSet.Contains(pos + right - up))
                 Instantiate(bigDoorPrefab, posV3 + offset, transform.rotation, organizer.transform);
-            else 
-            Instantiate(doorPrefab, posV3 + offset, Quaternion.Euler(0f, 0f, 90), organizer.transform);
+            else
+                Instantiate(doorPrefab, posV3 + offset, Quaternion.Euler(0f, 0f, 90), organizer.transform);
 
 
         }
-       
+
     }
 
-    public static Vector2Int findMostPos(HashSet<Vector2Int> set,Vector2Int dir)
+    public static Vector2Int findMostPos(HashSet<Vector2Int> set, Vector2Int dir)
     {
-        Vector2Int max = new Vector2Int(0,0);
+        Vector2Int max = new Vector2Int(0, 0);
         if (dir == Vector2Int.left)
         {
             max = new Vector2Int(0, 5000);
@@ -349,37 +351,39 @@ public class CorridorFirstDungeonGenerator : RandomWalkMapGen
                 if (pos.x < max.x)
                     max = pos;
             }
-        }else if( dir == Vector2Int.right)
+        }
+        else if (dir == Vector2Int.right)
         {
             max = new Vector2Int(0, -5000);
-            foreach(var pos in set)
+            foreach (var pos in set)
             {
                 if (pos.x > max.x)
                     max = pos;
             }
-        }else if(dir == Vector2Int.up)
+        }
+        else if (dir == Vector2Int.up)
         {
             max = new Vector2Int(-5000, 0);
-            foreach(var pos in set)
+            foreach (var pos in set)
             {
                 if (pos.y > max.y)
                     max = pos;
-                
+
             }
         }
         else
         {
             max = new Vector2Int(5000, 0);
-            foreach(var pos in set)
+            foreach (var pos in set)
             {
                 if (pos.y < max.y)
                     max = pos;
             }
         }
-           
+
         return max;
     }
-    
+
 
 
 }
