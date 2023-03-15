@@ -15,10 +15,6 @@ We are doing a 2D Top - Down Shooter Roguelike game using the Unity Engine.
 - [@Alexander Mollov](https://github.com/AMllV96)
 
 
-## Libraries Used
-
- - [A* Pathfinding Project](https://arongranberg.com/astar/)
-
 
 
 ## Screenshots
@@ -43,6 +39,9 @@ Tile Set:
 
 Will be released soon!!
 
+## Libraries Used
+
+ - [A* Pathfinding Project](https://arongranberg.com/astar/)
 
 ## Feedback
 
