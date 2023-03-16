@@ -161,7 +161,8 @@ namespace Pathfinding {
 
 		/// <summary>Helper which calculates points along the current path</summary>
 		protected PathInterpolator interpolator = new PathInterpolator();
-
+		/*[SerializeField]
+		private GameObject attackRange;*/
 		#region IAstarAI implementation
 
 		/// <summary>\copydoc Pathfinding::IAstarAI::Teleport</summary>
@@ -276,6 +277,24 @@ namespace Pathfinding {
 		/// A path is first requested by <see cref="UpdatePath"/>, it is then calculated, probably in the same or the next frame.
 		/// Finally it is returned to the seeker which forwards it to this function.
 		/// </summary>
+		/// 
+		private void OnTriggerEnter2D(Collider2D collision)
+		{
+			if (collision.gameObject.CompareTag("Player"))
+				canMove = true;
+
+		}
+		/*private void OnTriggerExit2D(Collider2D collision)
+		{
+			if (collision.gameObject.CompareTag("Player"))
+				canMove = false;
+		} */
+		
+
+		
+
+
+
 		protected override void OnPathComplete (Path newPath) {
 			ABPath p = newPath as ABPath;
 
