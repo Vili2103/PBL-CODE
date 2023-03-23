@@ -10,11 +10,18 @@ public class PlayerController : MonoBehaviour
     float horizontal;
     float vertical;
     public float diagonalMoveLimiter = 1f;
-    public float moveSpeed = 5.0f;
+    public float moveSpeed = 8.0f;
+    public int maxHP = 100;
+    public int currentHP;
     bool walkRight=false;
     bool walkLeft=false;
     bool walkDown=false;
     bool walkUp=false;
+
+    private void Start()
+    {
+        currentHP = maxHP;
+    }
 
 
     void Update()
@@ -40,6 +47,14 @@ public class PlayerController : MonoBehaviour
             //DIAGONALKA
         }
 
+    }
+   public  void TakeDMG(int dmg)
+    {
+        currentHP -= dmg;
+        if (currentHP <= 0)
+        {
+            Debug.Log("BOOOM"); 
+        }
     }
 
     void FixedUpdate() // We put it in FixedUpdate so it doesnt run more times based on player's FPS. I think it will run 60/s
