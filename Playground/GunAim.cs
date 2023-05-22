@@ -7,10 +7,12 @@ using UnityEngine;
 public class GunAim : MonoBehaviour
 {
    
+   private SpriteRenderer spriteG;
     // Start is called before the first frame update
     void Start()
     {
-        
+        this.spriteG = gameObject.GetComponent<SpriteRenderer>();;
+
         //Debug.Log("Hit!");
     }
     
@@ -21,7 +23,8 @@ public class GunAim : MonoBehaviour
        var dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
        var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
        transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
-
+       //flips gun to face right direction
+       spriteG.flipX = gameObject.transform.localEulerAngles.z > 180 ? false : true;
 
     }
 
