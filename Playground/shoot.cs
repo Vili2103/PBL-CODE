@@ -17,11 +17,14 @@ public class shoot : MonoBehaviour
     public float damage = 50;
     public float splashRadius = 0;
     public float bulletSpeed = 12;
-    public int framesToFlash = 5;
+    public int framesToFlash = 5; 
+    public float shakeIntensity = 5f;
+    public float shakeTime = .1f;
 
     private float tick;
     private BobMove PlayerScript;
     private bullet BulletScript;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,6 +45,7 @@ public class shoot : MonoBehaviour
     void Update()
     {
         if(Input.GetMouseButton(0) && tick>firerate) {
+            camGoBrrr.Instance.shakeCamera(shakeIntensity, shakeTime);
             foreach(var muzzle in shootingPointArr) {
                 Bang(muzzle);
             }
