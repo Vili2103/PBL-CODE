@@ -20,12 +20,16 @@ For our Project Based Learning Project in the 11th Grade, our team decided to ma
 ## Art
 Tile Set: 
 ![Tileset](https://github.com/Vili2103/PBL-CODE/blob/main/Art/Tile%20Maps/pbl%20game%20design%20v2.png?raw=true)
+
 Main Character: 
 ![MainCharacter](https://github.com/Vili2103/PBL-CODE/blob/main/Art/Sprite%20Sheets/Main%20Character/player.png?raw=true)
+
 Slime Enemy: 
 ![Slime](https://github.com/Vili2103/PBL-CODE/blob/main/Art/Sprite%20Sheets/Enemies/slime.png?raw=true)
+
 Wizard Enemy: 
 ![Wizard](https://github.com/Vili2103/PBL-CODE/blob/main/Art/Sprite%20Sheets/Enemies/wizard.png?raw=true)
+
 ## Roadmap
 
 - Add more Enemies
