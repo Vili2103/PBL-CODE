@@ -1,7 +1,7 @@
 
 # *Project Based Learning Project* 
 
-For our Project Based Learning Project in the 11th Grade, our team decided to make a 2D Shooter Roguelike game using the Unity Engine.
+For our Project Based Learning Project in the 11th Grade, our team decided to make a 2D Shooter Rogue-like game using the Unity Engine.
 
 
 ![Logo](https://github.com/Vili2103/PBL-CODE/blob/main/coding%20studio%20logo/game%20studio%20logo-02.jpg?raw=true)
