@@ -1,20 +1,20 @@
 
-# Project Based Learning Project 
+# *Project Based Learning Project* 
 
 For our Project Based Learning Project in the 11th Grade, our team decided to make a 2D Shooter Roguelike game using the Unity Engine.
 
 
 ![Logo](https://github.com/Vili2103/PBL-CODE/blob/main/coding%20studio%20logo/game%20studio%20logo-02.jpg?raw=true)
 
+## Game 
+- [**Download Latest Build**]()
 
 ## Team Members
 
 - [@Vilian Iliev](https://github.com/Vili2103) - Code behind Player, Procedural Generation, Enemy Logic, Animations
 - [@Dimitar Kapitanov](https://github.com/dmtr-k) - Art & Game Direction
-- [@Victor Ivanov](https://github.com/Vic2rious) - Music & Code behind Weapons, Camera Shake, Game Logic
+- [@Victor Ivanov](https://github.com/Vic2rious) - Music & Code behind Weapons, Camera Shake, Particle Effects, Game Logic
 - [@Alexander Mollov](https://github.com/AMllV96) - Main, Options & Death Menus
-
-
 
 
 ## Art
@@ -30,15 +30,14 @@ Slime Enemy:
 Wizard Enemy: 
 ![Wizard](https://github.com/Vili2103/PBL-CODE/blob/main/Art/Sprite%20Sheets/Enemies/wizard.png?raw=true)
 
+## Procedural Generation Video
+- [Video](https://drive.google.com/file/d/1XmYndzzT0jhUAmfwa305j-pNT1r13mS9/view?usp=sharing)
 ## Roadmap
 
 - Add more Enemies
 - Add more Decorations
 - Polish the Game 
 - Fix bugs.
-
-## Game 
-- [Download Latest Build]()
 
 
 ## Libraries Used
