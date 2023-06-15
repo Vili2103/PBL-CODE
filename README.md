@@ -9,6 +9,19 @@ For our Project Based Learning Project in the 11th Grade, our team decided to ma
 ## Game 
 - [**Download Latest Build**]()
 
+**Keybinds**
+
+
+| Action           	| Key                 	|
+|------------------	|---------------------	|
+| Move Left        	| A / Left Arrow Key  	|
+| Move Right       	| D / Right Arrow Key 	|
+| Move Down        	| S / Down Arrow Key  	|
+| Move Up          	| W / Up Arrow Key    	|
+| Attack / Fire    	| Left Mouse Button   	|
+| Interact / Equip 	| E                   	|
+| Change Weapon    	| Q                   	|
+
 ## Team Members
 
 - [@Vilian Iliev](https://github.com/Vili2103) - Code behind Player, Procedural Generation, Enemy Logic, Animations
