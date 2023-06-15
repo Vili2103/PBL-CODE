@@ -7,7 +7,7 @@ For our Project Based Learning Project in the 11th Grade, our team decided to ma
 ![Logo](https://github.com/Vili2103/PBL-CODE/blob/main/coding%20studio%20logo/game%20studio%20logo-02.jpg?raw=true)
 
 ## Game 
-- [**Download Latest Build**]()
+- [**Download Latest Build**](https://github.com/Vili2103/PBL-CODE/tree/main/Build)
 
 **Keybinds**
 
