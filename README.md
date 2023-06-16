@@ -1,5 +1,5 @@
 
-# *Project Based Learning Project* 
+# *Project Based Learning* 
 
 For our Project Based Learning Project in the 11th Grade, our team decided to make a 2D Shooter Rogue-like game using the Unity Engine.
 
